@@ -119,7 +119,11 @@ The memory subsystem supports only word (32-bit) aligned access:
 
 ### Control Unit Design Philosophy
 
-The control unit implements a finite state machine (FSM) approach rather than microcode-based control. This provides:
+The control unit implements a finite state machine (FSM) approach combined with combinational logic rather than microcode-based control.
+Instruction Type Decoding: Combinational logic decodes instructions into types based on opcode fields:
+ALU Opcode Generation: Combinational always block generates ALU control signals:
+Multiplexer Control: Combinational assignment of datapath control signals:
+This provides:
 
 - Deterministic timing for each instruction type
 - Simplified control logic
@@ -168,9 +172,8 @@ ALU operations are controlled through a 4-bit opcode:
 
 #### Control Signal Outputs
 
-The control unit generates the following control signals:
+The control unit generates the following control signals sequentially:
 
-- **alu_opcode[3:0]**: ALU operation selection
 - **ir_wr_en**: Instruction register write enable
 - **ic_count**: Instruction counter increment
 - **reg_wr_en**: Register bank write enable
@@ -179,6 +182,18 @@ The control unit generates the following control signals:
 - **mdr_rd_en**: Memory data register read enable
 - **imm_gen_instr_wr_en**: Immediate generator instruction write enable
 
+The following control signals are generated combinationally:
+
+- **alu_opcode[3:0]**: ALU operation selection
+- **reg_rs_1_addr_wr_en**: Register source 1 address write enable
+- **reg_rs_2_addr_wr_en**: Register source 2 address write enable
+- **reg_rd_addr_wr_en**: Register destination address write enable
+- **bc_en**: Branch comparator enable
+- **mux_1_sel, mux_2_sel**: Datapath multiplexer selection
+- **demux_1_sel**: ALU output demultiplexer selection
+- **mux_3_sel[1:0]**: Register writeback multiplexer selection
+
+  
 ### Multi-Cycle Operation Timing
 
 #### R-Type Instructions (2 cycles)
