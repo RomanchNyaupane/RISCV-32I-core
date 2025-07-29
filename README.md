@@ -20,7 +20,7 @@ The processor consists of the following major components:
 
 ### Datapath Architecture
 
-The processor uses a two-cycle datapath with the following key characteristics:
+The processor uses datapath with the following key characteristics:
 
 - 32-bit data width throughout the datapath
 - Multiplexers for datapath routing
@@ -43,9 +43,9 @@ The memory subsystem is organized into separate instruction and data memories, e
   - `data_mem_bank_0`: Bits [7:0]
 
 #### Instruction Memory (instruction_memory.v)
-- **Size**: 4096 words (16'h0FFF)
-- **Architecture**: 4-bank organization identical to data memory
-- **Banks**: Same bit allocation as data memory
+- Read Only Memory(ROM) based
+- Implemented using case statement
+- Not all RV32I instruction is implemented - non-word memory read/write, J type, U type, environment call and break instruction is planned to be implemented in future.
 
 ### Address Translation
 
@@ -120,9 +120,9 @@ The memory subsystem supports only word (32-bit) aligned access:
 ### Control Unit Design Philosophy
 
 The control unit implements a finite state machine (FSM) approach combined with combinational logic rather than microcode-based control.
-Instruction Type Decoding: Combinational logic decodes instructions into types based on opcode fields:
-ALU Opcode Generation: Combinational always block generates ALU control signals:
-Multiplexer Control: Combinational assignment of datapath control signals:
+- Instruction Type Decoding: Combinational logic decodes instructions into types based on opcode fields.
+- ALU Opcode Generation: Combinational always block generates ALU control signals.
+- Multiplexer Control: Combinational assignment of datapath control signals.
 This provides:
 
 - Deterministic timing for each instruction type
@@ -196,13 +196,11 @@ The following control signals are generated combinationally:
   
 ### Multi-Cycle Operation Timing
 
-#### R-Type Instructions (2 cycles)
-1. **Cycle 1**: Instruction fetch and state transition preparation
-2. **Cycle 2**: Decode, execute, writeback, and program counter increment
+#### R-Type Instructions (1 cycle)
+1. **Cycle 1**: Instruction fetch, decode, execute, writeback, and program counter increment.
 
-#### I-Type Arithmetic Instructions (2 cycles)  
-1. **Cycle 1**: Instruction fetch and Decode, execute, writeback, and program counter increment
-2. **Cycle 2**: transit to intermediate state because, we cannot transit back to same state since control signals need to reset for next instruction
+#### I-Type Arithmetic Instructions (1 cycle)  
+1. **Cycle 1**: Instruction fetch and Decode, execute, writeback, and program counter increment.
 
 #### I-Type Load Instructions (2 cycles)  
 1. **Cycle 1**: Instruction fetch Address calculation, memory read initiation, and memory address register update
@@ -212,16 +210,10 @@ The following control signals are generated combinationally:
 1. **Cycle 1**: Instruction fetch, Address calculation, data preparation, and memory address register update
 3. **Cycle 2**: Memory write completion
 
-#### B-Type Branch Instructions (2 cycles)
+#### B-Type Branch Instructions (1 cycles)
 1. **Cycle 1**: Instruction fetch and Condition evaluation and program counter update
-2. **Cycle 2**: transit to intermediate state to complete insturction memory reading and reset control signals.
 
-#### State Transition Constraint
-The FSM design requires that non-memory instructions execute in exactly 2 clock cycles due to state machine limitations:
 
-- **State Restriction**: FSM states cannot transition to themselves in the next cycle
-- **Minimum Execution Time**: All instructions require at least 2 cycles regardless of complexity
-- **Performance Impact**: Simple operations cannot be completed in a single cycle despite sufficient hardware resources
 
 ## Register Bank
 
@@ -356,7 +348,6 @@ The following RV32I instructions are not currently implemented:
 - **Data Width**: Fixed 32-bit data path
 - **Memory Access**: Word-aligned access only (no halfword or byte operations)
 - **Instruction Set**: Subset implementation missing JAL, JALR, LUI, and AUIPC instructions
-- **State Machine**: Fixed 2-cycle minimum execution time for all non-memory instructions
 - **Memory Design**: Synchronous operation requires clock cycle for all memory access
 
 ### Architecture Decisions
