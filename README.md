@@ -340,32 +340,7 @@ The following RV32I instructions are not currently implemented:
 - Load/Store Halfword (LH, LHU, SH)
 - Load/Store Byte (LB, LBU, SB)
 
-## Design Constraints
 
-### Current Limitations
-- **Memory Size**: Limited to 4K words per memory
-- **Address Space**: 5-bit instruction counter limits program size to 32 instructions
-- **Data Width**: Fixed 32-bit data path
-- **Memory Access**: Word-aligned access only (no halfword or byte operations)
-- **Instruction Set**: Subset implementation missing JAL, JALR, LUI, and AUIPC instructions
-- **Memory Design**: Synchronous operation requires clock cycle for all memory access
-
-### Architecture Decisions
-- **Multi-cycle Design**: Chosen over single-cycle for reduced hardware complexity
-- **FSM Control**: State machine approach provides deterministic timing but limits performance optimization
-- **Synchronous Memory**: Simplifies timing analysis but adds latency to memory operations
-
-## Usage
-
-### Simulation
-1. Include all Verilog files in simulation environment
-2. Instantiate `module_connect` as top-level module
-3. Apply clock and reset signals
-4. Load program into instruction memory
-5. Monitor register and memory states
-
-### Synthesis
-The design is synthesizable for FPGA implementation with appropriate clock constraints.
 
 ## File Structure
 
