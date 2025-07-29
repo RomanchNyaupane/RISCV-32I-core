@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains an implementation of a RISC-V RV32I processor in Verilog HDL. The processor implements the base integer instruction set architecture (ISA) with a two-cycle datapath and finite state machine-based control unit.
+This repository contains an implementation of a RISC-V RV32I processor in Verilog HDL. The processor implements the base integer instruction set architecture (ISA) with a finite state machine-based control unit.
 
 ## Architecture Overview
 
