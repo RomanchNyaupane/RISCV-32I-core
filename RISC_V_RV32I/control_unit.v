@@ -103,7 +103,7 @@ always @(*) begin
         {7'b0010011, 3'b000}: alu_opcode = 4'b0001; //addi
         {7'b0100011, 3'b010}: alu_opcode = 4'b0001; //add in case of store
         {7'b0000011, 3'b010}: alu_opcode = 4'b0001; //add in case of load 
-        {7'b1100011, 3'b001}: alu_opcode = 4'b0001; //add in case of branch
+        {7'b1100011, 3'b001}: alu_opcode = 4'b0001; //add in case of branch. subtact 1 from program counter
         {7'b0010011, 3'b100}: alu_opcode = 4'b0011; //xori
         {7'b0010011, 3'b110}: alu_opcode = 4'b0100; //ori
         {7'b0010011, 3'b111}: alu_opcode = 4'b0101; //andi
@@ -129,7 +129,7 @@ always @(posedge ctrl_clk) begin
         state <= next_state;
 end
 
-always @(state, opcode, instr_in) begin
+always @(state, opcode, instr_in, instr_type) begin
     ic_count = 0;
     ir_wr_en = 0;
     reg_wr_en = 0;
@@ -149,14 +149,16 @@ always @(state, opcode, instr_in) begin
 
         state_2: begin 
             ir_wr_en = 1;
+            //ic_count = 1;
+
             case (instr_type)
                 R_type: begin
                     rs_2_out_en = 1;
                     rs_1_out_en = 1;
                     alu_out_en = 1;
                     reg_wr_en = 1;
-                    temp_var = 1;
-                    ic_count = 1;
+                                ic_count = 1;
+
                     next_state = state_1;
                 end
                 I_type_1: begin
@@ -190,7 +192,7 @@ always @(state, opcode, instr_in) begin
                     rs_1_out_en = 0;
                     rs_2_out_en = 0;
                     ic_wr_en = 1;
-                    ic_count = 0;
+                    ic_count = 1;
                     next_state = state_1;
                 end
                 default: next_state = state_5;
