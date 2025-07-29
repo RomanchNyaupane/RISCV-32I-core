@@ -129,7 +129,7 @@ always @(posedge ctrl_clk) begin
         state <= next_state;
 end
 
-always @(state, opcode, instr_in, instr_type) begin
+always @(state, opcode, instr_in, instr_type, bc_in) begin
     ic_count = 0;
     ir_wr_en = 0;
     reg_wr_en = 0;
@@ -159,15 +159,16 @@ always @(state, opcode, instr_in, instr_type) begin
                     reg_wr_en = 1;
                                 ic_count = 1;
 
-                    next_state = state_1;
+                    next_state = state_2;
                 end
                 I_type_1: begin
+                    imm_gen_instr_wr_en = 1;
                     rs_2_out_en = 0;
                     rs_1_out_en = 1;
                     alu_out_en = 1;
                     reg_wr_en = 1;
                     ic_count = 1;
-                    next_state = state_1;
+                    next_state = state_2;
                 end
                 I_type_2: begin // load word
                     imm_gen_instr_wr_en = 1;
@@ -191,9 +192,10 @@ always @(state, opcode, instr_in, instr_type) begin
                     imm_gen_instr_wr_en = 1;
                     rs_1_out_en = 0;
                     rs_2_out_en = 0;
-                    ic_wr_en = 1;
+                    if(bc_in) ic_wr_en = 1;
                     ic_count = 1;
-                    next_state = state_1;
+                    //reg_wr_en = 1;
+                    next_state = state_2;
                 end
                 default: next_state = state_5;
             endcase
